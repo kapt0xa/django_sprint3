@@ -75,6 +75,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    if (!std::getenv("VIRTUAL_ENV"))
+    {
+        std::cout << "Virtual environment is not active." << std::endl;
+        return 1;
+    }
+
     for (int i = 1; i < argc; i++)
     {
         auto&& current_word = std::string(argv[i]);

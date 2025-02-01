@@ -6,6 +6,20 @@ __pycache__/
 # C extensions
 *.so
 
+# C++ compiled objects
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.lib
+*.dll
+*.exp
+*.pdb
+*.ilk
+*.dSYM/
+*.dSYM/*
+
 # Distribution / packaging
 .Python
 build/

@@ -34,11 +34,11 @@ class Post(PublishedModel):
     title = models.CharField('Заголовок', max_length=256)
     text = models.TextField('Текст')
     pub_date = models.DateTimeField('Дата и время публикации', blank=False)
-    author = models.ForeignKey('Автор публикации', User,
-                               on_delete=models.CASCADE, null=True)
-    location = models.ForeignKey('Местоположение', Location, 
+    author = models.ForeignKey(User, verbose_name='Автор публикации',
+                               on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, verbose_name='Местоположение',
                                  on_delete=models.SET_NULL, null=True)
-    category = models.ForeignKey('Категория', Category,
+    category = models.ForeignKey(Category, verbose_name='Категория',
                                  on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField('Добавлено', auto_now_add=True)
 

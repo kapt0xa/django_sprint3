@@ -5,7 +5,7 @@ from django.http import Http404
 class PostStorage:
     def __init__(self, posts_val=None, default=False):
         if default:
-            posts_val = posts
+            posts_val = {}
         self.posts = dict()
         if posts_val:
             for post in posts_val:

@@ -7,7 +7,7 @@ from core.models import PublishedModel
 class Category(PublishedModel):
     title = models.CharField('Заголовок', max_length=256)
     description = models.TextField('Описание')
-    slug = models.SlugField('Идетификатор', unique=True)
+    slug = models.SlugField('Иднетификатор', unique=True)
     created_at = models.DateTimeField('Добавлено', auto_now_add=True)
 
     class Meta:

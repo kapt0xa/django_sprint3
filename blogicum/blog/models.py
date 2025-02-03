@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from core.models import PublishedModel 
+from core.models import PublishedModel
 
 
 class Category(PublishedModel):

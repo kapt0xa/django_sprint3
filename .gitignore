@@ -3,6 +3,15 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#input/output files
+input.txt
+in.txt
+output.txt
+out.txt
+errors.txt
+err.txt
+log.txt
+
 # C extensions
 *.so
 

@@ -13,6 +13,8 @@ def index(request):
 
 def post_detail(request, post_id: int):
     post = get_object_or_404(Post, pk=post_id, is_published=True, pub_date__lte=timezone.now())
+    if(Category.objects.get(pk=post.category_id).is_published == False):
+        raise Http404("Category is not published")
     return render(request, "blog/detail.html",
                   {"post": post, "post_id": post_id})
 
@@ -23,4 +25,4 @@ def category_posts(request, category_slug):
     return render(request, "blog/index.html",
                   {"post_list": Post.objects
                    .filter(is_published=True,category=category, pub_date__lte=timezone.now())
-                   .order_by('pub_date')[:5]})
+                   .order_by('pub_date')})

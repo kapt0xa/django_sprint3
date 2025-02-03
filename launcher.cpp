@@ -4,166 +4,86 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <array>
+#include <stdexcept>
 
 using namespace std::string_literals;
 
-std::map<std::string, std::set<std::string>> commands = {
-    {"migrate"s, {"migrate"s, "mg"s}},
-    {"makemigrations"s, {"makemigrations"s, "mm"s}},
-
-    {"no_run"s, {"stop"s, "sp"s}},
-    {"help"s, {"--help"s, "-h"s, "h"s, "help"s}},
-    {"not_wait", {"not_wait"s, "nw"s}},
-
-    {"pass_all_to_manage_py", {"-p"s}},
-};
-
-const auto&& comand_base = "python blogicum/manage.py"s;
-
-bool validate_command(std::string command)
-{
-    for(auto&& [command_name, aliases] : commands)
-    {
-        if(aliases.count(command))
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool validate_commands(std::vector<std::string> commands_arr)
-{
-    if(commands_arr.empty())
-    {
-        return true;
-    }
-    for(auto&& command : commands_arr)
-    {
-        if(commands["pass_all_to_manage_py"s].count(command))
-        {
-            return true;
-        }
-        if(!validate_command(command))
-        {
-            return false;
-        }
-    }
-    return true;
-}
+const auto&& comand_base = "python blogicum/manage.py "s;
+const auto&& recompile_clang = "clang launcher.cpp -o launch.exe"s; // windows recomended
+const auto&& recompile_gpp = "g++ launcher.cpp -o launch"s; // ubuntu recomended
 
 int main(int argc, char *argv[])
 {
+    using namespace std;
 
-    bool not_wait = false;
-    bool no_run = false;
-
-    std::vector<std::string> custom_commands;
-
-    auto&& programm_name = std::string(argv[0]);
-
-    if(!validate_commands(std::vector<std::string>(argv + 1, argv + argc)))
+    if(argc == 1)
     {
-        std::cout << "Invalid command" << std::endl;
-        std::cout << "Usage:" << std::endl;
-        std::cout << programm_name << " "s << *commands["makemigrations"s].begin() << " "s << *commands["migrate"s].begin() << std::endl;
-        std::cout << programm_name << " "s << *commands["-p"s].begin() << " "s << "createsuperuser"s << std::endl;
-        std::cout << "For more information use:" << std::endl;
-        std::cout << programm_name << " "s << *commands["help"s].begin() << std::endl;
-        std::cout << "Press any key to continue..." << std::endl;
-        std::cin.get();
+        auto comand = comand_base + "runserver"s;
+        cout << comand << " ==vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv==" << endl;
+        system(comand.c_str());
+
+        cout << "Something went wrong. U was supposed to end process with ctrl+c and never reach tis output.";
         return 1;
     }
 
-    if (!std::getenv("VIRTUAL_ENV"))
+    array<string, 4> default_commands = {"(custom command)", "makemigration"s, "migrate"s, "createsuperuser"s};
+
+    int switcher = 0;
+
+    if(argc = 2)
     {
-        std::cout << "Virtual environment is not active." << std::endl;
-        return 1;
-    }
-
-    for (int i = 1; i < argc; i++)
-    {
-        auto&& current_word = std::string(argv[i]);
-        if (commands["no_run"s].count(current_word))
+        string arg = argv[1];
+        if(arg == "clang"s | arg == "g++")
         {
-            std::cout << "Server run will not be run by default" << std::endl;
-            no_run = true;
-            continue;
-        }
-        if (commands["wait"s].count(current_word))
-        {
-            std::cout << "Server will wait for input in the end" << std::endl;
-            not_wait = true;
-            continue;
-        }
-        if (commands["help"s].count(current_word))
-        {
-            std::cout << "help"s << " ==vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=="s << std::endl;
-            for(auto&& [command_name, aliases] : commands)
-            {
-                std::cout << command_name << " ";
-                for(auto&& alias : aliases)
-                {
-                    std::cout << alias << " ";
-                }
-                std::cout << std::endl;
-            }
-            std::cout << "help"s << " ==^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^=="s << std::endl;
-            continue;
-        }
-        if (commands["makemigrations"s].count(current_word))
-        {
-            auto&& comand = comand_base + " makemigrations";
-            std::cout << comand << " ==vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=="s << std::endl;
-            system(comand.c_str());
-            std::cout << comand << " ==^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^=="s << std::endl;
-            continue;
-        }
-        if (commands["migrate"s].count(current_word))
-        {
-            auto&& comand = comand_base + " migrate";
-            std::cout << comand << " ==vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=="s << std::endl;
-            system(comand.c_str());
-            std::cout << comand << " ==^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^=="s << std::endl;
-            continue;
-        }
-        if (commands["pass_all_to_manage_py"s].count(current_word))
-        {
-            std::string comand = comand_base;
-
-            for (int j = i + 1; j < argc; j++)
-            {
-                comand += " "s + std::string(argv[j]);
-            }
-
-            std::cout << comand << " ==vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=="s << std::endl;
-            system(comand.c_str()); // vvv the rest of code might be unreachable due to CTRL-BREAK exit of django vvv
-            std::cout << comand << " ==^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^=="s << std::endl;
-
-        if(!not_wait)
-        {
-            std::cout << "Press any key to continue..." << std::endl;
-            std::cin.get();
-        }
-
+            cout << "cant recompile on run. copy and paste one of this commands:"s << endl;
+            cout << recompile_clang << endl;
+            cout << recompile_gpp << endl;
+            cout << "g++ recomended for ubuntu, clang - for windows"s << endl;
             return 0;
         }
-    }
 
-    if(!no_run)
+        try
+        {
+            switcher = stoi(argv[1]);
+            default_commands.at(switcher);
+        }
+        catch(...)
+        {
+            cout << "choose variant that would be passed to manage.py:" << endl;
+            for(int i = 0; i < default_commands.size(); ++i)
+            {
+                cout << i << ": "s << default_commands[i] << endl;
+            }
+
+            cin >> switcher;
+            if (cin.fail() || switcher < 0 || switcher >= default_commands.size())
+            {
+                cout << "invalid input"s << endl;
+                return -1;
+            }
+        }
+    }
+    else
     {
-        auto&& comand = comand_base + " runserver";
-
-        std::cout << comand << " ==vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=="s << std::endl;
-        system(comand.c_str()); // vvv the rest of code might be unreachable due to CTRL-BREAK exit of django vvv
-        std::cout << comand << " ==^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^=="s << std::endl;
+        cout << "invalid input"s << endl;
+        return -1;
     }
-
-    if(!not_wait)
+    
+    string args;
+    if(switcher == 0)
     {
-        std::cout << "Press any key to continue..." << std::endl;
-        std::cin.get();
+        cout << "enter custom command:" << endl;
+        getline(cin, args);
+        getline(cin, args);
     }
-
+    else
+    {
+        args = default_commands.at(switcher);
+    }
+    auto comand = comand_base + args;
+    cout << comand << " ==vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv==" << endl;
+    system(comand.c_str());
+    cout << comand << " ==^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^==" << endl;
     return 0;
 }

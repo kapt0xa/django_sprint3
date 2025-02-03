@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import Http404
 from django.utils import timezone
+# Might be needed: from django.http import Http404
 
 from .models import Post, Category
 
@@ -12,7 +12,6 @@ def index(request):
                            pub_date__lte=timezone.now(),
                            category__is_published=True)
                    .order_by('pub_date')[:5]})
-#pub_date__lte=timezone.now()
 
 
 def post_detail(request, post_id: int):

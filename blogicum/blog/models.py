@@ -7,7 +7,7 @@ from core.models import PublishedModel
 class Category(PublishedModel):
     title = models.CharField('Заголовок', max_length=256)
     description = models.TextField('Описание')
-    slug = models.SlugField('Иднетификатор', unique=True,
+    slug = models.SlugField('Идентификатор', unique=True,
                             help_text='Идентификатор страницы для URL;'
                             ' разрешены символы латиницы, '
                             'цифры, дефис и подчёркивание.')
@@ -15,7 +15,7 @@ class Category(PublishedModel):
 
     class Meta:
         verbose_name = 'категория'
-        verbose_name_plural = 'категории'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.title
@@ -26,8 +26,8 @@ class Location(PublishedModel):
     created_at = models.DateTimeField('Добавлено', auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Местоположение'
-        verbose_name_plural = 'местоположения'
+        verbose_name = 'местоположение'
+        verbose_name_plural = 'Местоположения'
 
     def __str__(self):
         return self.name
@@ -49,8 +49,8 @@ class Post(PublishedModel):
     created_at = models.DateTimeField('Добавлено', auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Публикация'
-        verbose_name_plural = 'публикации'
+        verbose_name = 'публикация'
+        verbose_name_plural = 'Публикации'
 
     def __str__(self):
         return self.title

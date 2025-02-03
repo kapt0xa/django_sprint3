@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
         std::cout << programm_name << " "s << *commands["makemigrations"s].begin() << " "s << *commands["migrate"s].begin() << std::endl;
         std::cout << programm_name << " "s << *commands["-p"s].begin() << " "s << "createsuperuser"s << std::endl;
         std::cout << "For more information use:" << std::endl;
-        std::cout << programm_name << " "s << *commands["-h"s].begin() << std::endl;
+        std::cout << programm_name << " "s << *commands["help"s].begin() << std::endl;
         std::cout << "Press any key to continue..." << std::endl;
         std::cin.get();
         return 1;

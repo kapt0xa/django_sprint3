@@ -1,36 +1,25 @@
-from django.shortcuts import render, get_object_or_404
-from django.utils import timezone
-# Might be needed: from django.http import Http404
+from django.shortcuts import render
 
 from .models import Post, Category
 
 
 def index(request):
-    return render(request, "blog/index.html",
-                  {"post_list": Post.objects
-                   .filter(is_published=True,
-                           pub_date__lte=timezone.now(),
-                           category__is_published=True)
+    return render(request, 'blog/index.html',
+                  {'post_list': Post
+                   .filter_published()
                    .order_by('pub_date')[:5]})
 
 
 def post_detail(request, post_id: int):
-    return render(request, "blog/detail.html",
-                  {"post": get_object_or_404(
-                      Post, pk=post_id,
-                      is_published=True,
-                      pub_date__lte=timezone.now(),
-                      category__is_published=True),
-                   "post_id": post_id})
+    return render(request, 'blog/detail.html',
+                  {'post': Post
+                   .get_by_id_or_404(post_id)})
 
 
 def category_posts(request, category_slug):
-    category = get_object_or_404(Category,
-                                 slug=category_slug,
-                                 is_published=True)
-    return render(request, "blog/index.html",
-                  {"post_list": Post.objects
-                   .filter(is_published=True,
-                           category=category,
-                           pub_date__lte=timezone.now())
+    category = Category.get_by_slug_or_404(category_slug)
+    return render(request, 'blog/index.html',
+                  {'post_list': Post
+                   .filter_published()
+                   .filter(category=category)
                    .order_by('pub_date')})

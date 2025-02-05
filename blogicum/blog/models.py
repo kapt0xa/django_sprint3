@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.http import Http404
 
 from core.models import PublishedModel
 from .constants import NAME_MAX_LEN, REPORT_NAME_MAX_LEN
@@ -19,6 +18,11 @@ class Category(PublishedModel):
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
+    def __str__(self):
+        if len(self.title) > REPORT_NAME_MAX_LEN:
+            return self.title[:REPORT_NAME_MAX_LEN] + '…'
+        return self.title
+
     @staticmethod
     def filter_published():
         """Returns filters published categories."""
@@ -26,17 +30,12 @@ class Category(PublishedModel):
             is_published=True)
 
     @staticmethod
-    def get_by_slug_or_404(id):
-        """Returns published category or raises 404."""
+    def get_by_slug_or_none(id):
+        """Returns published category or None if not found."""
         try:
             return Category.filter_published().get(slug=id)
         except Category.DoesNotExist:
-            raise Http404(f'Category with id {id} not found.')
-
-    def __str__(self):
-        if len(self.title) > REPORT_NAME_MAX_LEN:
-            return self.title[:REPORT_NAME_MAX_LEN] + '…'
-        return self.title
+            return None
 
 
 class Location(PublishedModel):
@@ -65,21 +64,6 @@ class Post(PublishedModel):
     category = models.ForeignKey(Category, verbose_name='Категория',
                                  on_delete=models.SET_NULL, null=True)
 
-    @staticmethod
-    def filter_published():
-        """Returns filters published posts, not in future."""
-        return Post.objects.filter(is_published=True,
-                                   pub_date__lte=timezone.now(),
-                                   category__is_published=True)
-
-    @staticmethod
-    def get_by_id_or_404(id):
-        """Returns published post or raises 404."""
-        try:
-            return Post.filter_published().get(pk=id)
-        except Post.DoesNotExist:
-            raise Http404(f'Post with id {id} not found.')
-
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
@@ -89,4 +73,17 @@ class Post(PublishedModel):
             return self.title[:REPORT_NAME_MAX_LEN] + '…'
         return self.title
 
-# Create your models here.
+    @staticmethod
+    def filter_published():
+        """Returns filters published posts, not in future."""
+        return Post.objects.filter(is_published=True,
+                                   pub_date__lte=timezone.now(),
+                                   category__is_published=True)
+
+    @staticmethod
+    def get_by_id_or_none(id):
+        """Returns published post or None if not found."""
+        try:
+            return Post.filter_published().get(pk=id)
+        except Post.DoesNotExist:
+            return None

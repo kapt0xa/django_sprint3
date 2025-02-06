@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 
 from core.models import PublishedModel
 from .constants import NAME_MAX_LEN, REPORT_NAME_MAX_LEN
@@ -30,12 +31,9 @@ class Category(PublishedModel):
             is_published=True)
 
     @staticmethod
-    def get_by_slug_or_none(id):
-        """Returns published category or None if not found."""
-        try:
-            return Category.filter_published().get(slug=id)
-        except Category.DoesNotExist:
-            return None
+    def get_by_slug_or_404(slug):
+        """Returns published category or raises Http404"""
+        return get_object_or_404(Category, slug=slug, is_published=True)
 
 
 class Location(PublishedModel):
@@ -81,9 +79,10 @@ class Post(PublishedModel):
                                    category__is_published=True)
 
     @staticmethod
-    def get_by_id_or_none(id):
-        """Returns published post or None if not found."""
-        try:
-            return Post.filter_published().get(pk=id)
-        except Post.DoesNotExist:
-            return None
+    def get_by_id_or_404(id):
+        """Returns published post or raises Http404."""
+        return get_object_or_404(Post,
+                                 pk=id,
+                                 is_published=True,
+                                 pub_date__lte=timezone.now(),
+                                 category__is_published=True)
